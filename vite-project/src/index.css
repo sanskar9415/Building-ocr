@@ -1,0 +1,62 @@
+
+.app {
+  /* background-color: #333; */
+  height: 100vh;
+}
+
+.file-upload {
+  width: 300px;
+  margin: 50px auto;
+  padding: 20px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.file-upload h2 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.file-upload form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.file-upload input[type="file"] {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+}
+
+.file-upload button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #4caf50;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.file-upload button:disabled {
+  background-color: #bbb;
+  cursor: not-allowed;
+}
+
+.file-upload button:hover:not(:disabled) {
+  background-color: #45a049;
+}
+
+.file-upload p {
+  margin-top: 10px;
+  color: red;
+  font-size: 0.9rem;
+}

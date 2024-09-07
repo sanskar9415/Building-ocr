@@ -1,0 +1,26 @@
+# Python related files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+
+# Virtual environment files
+Lib/
+Include/
+Scripts/
+pyvenv.cfg
+
+# CPH cache files (might be related to some extension/tool)
+*.cph
+
+# Byte-compiled / optimized / DLL files
+*.py[cod]
+
+# Other common ignores
+*.log
+*.sqlite3
+
+# Ignore virtual environment config file
+pyvenv.cfg
+
