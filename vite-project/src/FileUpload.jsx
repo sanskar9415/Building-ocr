@@ -4,6 +4,8 @@ const FileUpload = () => {
   const [file, setFile] = useState(null);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [extractedText, setExtractedText] = useState(null);
+
 
   const supportedFormats = ['image/jpeg', 'image/png', 'application/pdf', 'image/tiff'];
 
@@ -21,24 +23,25 @@ const FileUpload = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+  
     if (!file) {
       setError('Please upload a valid file.');
       return;
     }
-
+  
     const formData = new FormData();
     formData.append('file', file);
-
+  
     try {
       const response = await fetch('http://localhost:8000/upload', {
         method: 'POST',
         body: formData,
       });
-
+  
       const result = await response.json();
       if (response.ok) {
         setSuccessMessage(`File uploaded successfully: ${result.file_name}`);
+        setExtractedText(result.extracted_text); // Display extracted text
         setFile(null);  // Clear the file input
       } else {
         setError(result.detail || 'Error uploading file');
@@ -48,6 +51,7 @@ const FileUpload = () => {
       console.error('Error uploading file', err);
     }
   };
+  
 
   return (
     <div className="file-upload">
@@ -62,6 +66,13 @@ const FileUpload = () => {
         {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
         <button type="submit" disabled={!file}>Upload</button>
       </form>
+      {extractedText && (
+  <div>
+    <h3>Extracted Text:</h3>
+    <p>{extractedText}</p>
+  </div>
+)}
+
     </div>
   );
 };
