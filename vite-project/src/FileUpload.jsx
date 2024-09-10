@@ -5,7 +5,7 @@ const FileUpload = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [extractedText, setExtractedText] = useState(null);
-
+  const [previewUrl, setPreviewUrl] = useState(null);
 
   const supportedFormats = ['image/jpeg', 'image/png', 'application/pdf', 'image/tiff'];
 
@@ -15,9 +15,13 @@ const FileUpload = () => {
     if (selectedFile && supportedFormats.includes(selectedFile.type)) {
       setFile(selectedFile);
       setError(null);
+      
+      const fileUrl = URL.createObjectURL(selectedFile);
+      setPreviewUrl(fileUrl);
     } else {
       setError('Unsupported file format. Please upload a JPEG, PNG, PDF, or TIFF file.');
       setFile(null);
+      setPreviewUrl(null);
     }
   };
 
@@ -41,8 +45,9 @@ const FileUpload = () => {
       const result = await response.json();
       if (response.ok) {
         setSuccessMessage(`File uploaded successfully: ${result.file_name}`);
-        setExtractedText(result.extracted_text); // Display extracted text
-        setFile(null);  // Clear the file input
+        setExtractedText(result.extracted_text || "No text extracted.");
+        setFile(null);
+        setPreviewUrl(null);
       } else {
         setError(result.detail || 'Error uploading file');
       }
@@ -51,7 +56,6 @@ const FileUpload = () => {
       console.error('Error uploading file', err);
     }
   };
-  
 
   return (
     <div className="file-upload">
@@ -66,13 +70,23 @@ const FileUpload = () => {
         {successMessage && <p style={{ color: 'green' }}>{successMessage}</p>}
         <button type="submit" disabled={!file}>Upload</button>
       </form>
+      {previewUrl && (
+        <div>
+          <h3>File Preview:</h3>
+          {file.type.startsWith('image/') && (
+            <img src={previewUrl} alt="Preview" style={{ maxWidth: '100%', maxHeight: '400px' }} />
+          )}
+          {file.type === 'application/pdf' && (
+            <iframe src={previewUrl} style={{ width: '100%', height: '400px' }}></iframe>
+          )}
+        </div>
+      )}
       {extractedText && (
-  <div>
-    <h3>Extracted Text:</h3>
-    <p>{extractedText}</p>
-  </div>
-)}
-
+        <div>
+          <h3>Extracted Text:</h3>
+          <p>{extractedText}</p>
+        </div>
+      )}
     </div>
   );
 };

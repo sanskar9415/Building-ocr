@@ -12,7 +12,6 @@ S3_REGION = "ap-southeast-2"
 s3_client = boto3.client("s3", region_name=S3_REGION)
 textract_client = boto3.client('textract', region_name=S3_REGION)
 
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -29,7 +28,6 @@ async def read_root():
 async def upload_file(file: UploadFile = File(...)):
     try:
         print(f"File received: {file.filename}, Content type: {file.content_type}")
-        # Upload the file to S3
         s3_client.upload_fileobj(
             file.file, 
             S3_BUCKET,  
@@ -37,7 +35,6 @@ async def upload_file(file: UploadFile = File(...)):
             ExtraArgs={"ContentType": file.content_type},
         )
         
-        # Call Amazon Textract to analyze the document
         textract_response = textract_client.start_document_text_detection(
             DocumentLocation={
                 'S3Object': {
@@ -49,14 +46,12 @@ async def upload_file(file: UploadFile = File(...)):
 
         job_id = textract_response['JobId']
 
-        # Wait for Textract to complete processing (polling)
         status = None
         while status != 'SUCCEEDED':
             response = textract_client.get_document_text_detection(JobId=job_id)
             status = response['JobStatus']
-            time.sleep(5)  # Wait 5 seconds between status checks
+            time.sleep(5)
 
-        # Extract text from the Textract response
         extracted_text = ''
         for result_page in response['Blocks']:
             if result_page['BlockType'] == 'LINE':
