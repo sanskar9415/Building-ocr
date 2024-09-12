@@ -1,24 +1,34 @@
-
-.app {
-  /* background-color: #333; */
-  height: 100vh;
+/* Global Styles */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+  color: #333;
 }
 
+/* App Container */
+.app {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* File Upload Component */
 .file-upload {
-  width: 300px;
-  margin: 50px auto;
+  width: 400px;
   padding: 20px;
-  border: 2px solid #ddd;
-  border-radius: 10px;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  border: 1px solid #e0e0e0;
 }
 
 .file-upload h2 {
-  text-align: center;
-  color: #333;
+  font-size: 1.75rem;
   margin-bottom: 20px;
-  font-size: 1.5rem;
+  color: #333;
 }
 
 .file-upload form {
@@ -28,35 +38,135 @@
 }
 
 .file-upload input[type="file"] {
-  margin-bottom: 15px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
   font-size: 1rem;
+  margin-bottom: 20px;
+  background-color: #fafafa;
 }
 
 .file-upload button {
-  padding: 10px 20px;
+  width: 100%;
+  padding: 12px;
   border: none;
-  border-radius: 5px;
-  background-color: #4caf50;
+  border-radius: 8px;
+  background-color: #007bff;
   color: white;
   font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, transform 0.2s;
 }
 
 .file-upload button:disabled {
-  background-color: #bbb;
+  background-color: #b0bec5;
   cursor: not-allowed;
 }
 
 .file-upload button:hover:not(:disabled) {
-  background-color: #45a049;
+  background-color: #0056b3;
+  transform: scale(1.02);
 }
 
 .file-upload p {
-  margin-top: 10px;
-  color: red;
+  margin-top: 15px;
   font-size: 0.9rem;
+}
+
+.error-message {
+  color: #d9534f;
+}
+
+.success-message {
+  color: #5bc0de;
+}
+
+/* File Preview */
+.file-preview {
+  margin-top: 20px;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 20px;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 300px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.preview-pdf {
+  width: 100%;
+  height: 300px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.extracted-text {
+  margin-top: 20px;
+  text-align: left;
+}
+
+/* Radio Button Styles */
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.radio-container {
+  display: flex;
+  align-items: center;
+  position: relative;
+  padding-left: 30px;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.radio-container input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.radio-checkmark {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 20px;
+  width: 20px;
+  background-color: #fff;
+  border: 2px solid #007bff;
+  border-radius: 50%;
+  transition: background 0.3s, border-color 0.3s;
+  transform: translateY(-50%);
+}
+
+.radio-container input[type="radio"]:checked ~ .radio-checkmark {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.radio-checkmark::after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.radio-container input[type="radio"]:checked ~ .radio-checkmark::after {
+  display: block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.radio-container:hover .radio-checkmark {
+  border-color: #0056b3;
 }

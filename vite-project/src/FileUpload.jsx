@@ -5,7 +5,10 @@ const FileUpload = () => {
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
   const [extractedText, setExtractedText] = useState(null);
+  const [extractedFormData, setExtractedFormData] = useState(null); // State for form data
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [averageConfidence, setAverageConfidence] = useState(null);  // New state for confidence score
+  const [uploadType, setUploadType] = useState('text'); // New state for upload type (text/form)
 
   const supportedFormats = ['image/jpeg', 'image/png', 'application/pdf', 'image/tiff'];
 
@@ -35,17 +38,26 @@ const FileUpload = () => {
   
     const formData = new FormData();
     formData.append('file', file);
-  
+    
+    const endpoint = uploadType === 'form' ? 'http://localhost:8000/upload-form' : 'http://localhost:8000/upload-text';
+
     try {
-      const response = await fetch('http://localhost:8000/upload', {
+      const response = await fetch(endpoint, {
         method: 'POST',
         body: formData,
       });
   
       const result = await response.json();
       if (response.ok) {
-        setSuccessMessage(`File uploaded successfully: ${result.file_name}`);
-        setExtractedText(result.extracted_text || "No text extracted.");
+        setSuccessMessage(`File uploaded successfully.`);
+
+        if (uploadType === 'text') {
+          setExtractedText(result.extracted_text || "No text extracted.");
+          setAverageConfidence(result.average_confidence || 0);  // Set confidence score
+        } else {
+          setExtractedFormData(result.form_data || {});
+        }
+
         setFile(null);
         setPreviewUrl(null);
       } else {
@@ -61,6 +73,28 @@ const FileUpload = () => {
     <div className="file-upload">
       <h2>Upload a Document</h2>
       <form onSubmit={handleSubmit}>
+        <div>
+          <label>
+            <input 
+              type="radio" 
+              name="uploadType" 
+              value="text" 
+              checked={uploadType === 'text'}
+              onChange={() => setUploadType('text')} 
+            /> 
+            Extract Text
+          </label>
+          <label>
+            <input 
+              type="radio" 
+              name="uploadType" 
+              value="form" 
+              checked={uploadType === 'form'}
+              onChange={() => setUploadType('form')} 
+            /> 
+            Extract Form Data
+          </label>
+        </div>
         <input 
           type="file" 
           accept=".jpeg,.jpg,.png,.pdf,.tiff"
@@ -85,6 +119,19 @@ const FileUpload = () => {
         <div>
           <h3>Extracted Text:</h3>
           <p>{extractedText}</p>
+          <h4>Confidence Score: {averageConfidence}%</h4>  {/* Display confidence score */}
+        </div>
+      )}
+      {extractedFormData && (
+        <div>
+          <h3>Extracted Form Data:</h3>
+          <ul>
+            {Object.entries(extractedFormData).map(([key, value], index) => (
+              <li key={index}>
+                <strong>{key}:</strong> {value}
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>
