@@ -1,203 +1,180 @@
-import logging
-from fastapi import FastAPI, UploadFile, File, HTTPException
-import boto3
-from botocore.exceptions import NoCredentialsError
+from fastapi import FastAPI, Response
+from fastapi.responses import FileResponse
+import psycopg2
+import csv
+import os
 from fastapi.middleware.cors import CORSMiddleware
-import time
-from transformers import pipeline
-import openai
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
-logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-S3_BUCKET = "ocr-swingbell"
-S3_REGION = "ap-southeast-2"
-
-s3_client = boto3.client("s3", region_name=S3_REGION)
-textract_client = boto3.client('textract', region_name=S3_REGION)
-
-openai.api_key = 'WRITE THE OPEN AI KEY HERE'
-
-summarizer = pipeline("summarization", model="sshleifer/distilbart-cnn-12-6")
+origins = [
+    "http://localhost:5173",  # Your frontend's URL
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-logging.info("Application startup")
+# Database connection (PostgreSQL)
+conn = psycopg2.connect(
+    dbname="swingbell",
+    user="asimith",
+    password="asimith",
+    host="13.126.33.160",
+    port="5432"
+)
+cur = conn.cursor()
 
-@app.get("/")
-async def read_root():
-    logging.info("Root endpoint accessed")
-    return {"message": "Welcome to the file upload API"}
+# Function to execute a query and return data
+def fetch_query_data(query):
+    cur.execute(query)
+    return cur.fetchall(), [desc[0] for desc in cur.description]
 
-@app.post("/upload-text")
-async def upload_text(file: UploadFile = File(...)):
-    try:
-        logging.info(f"File received for text extraction: {file.filename}, Content type: {file.content_type}")
-        s3_client.upload_fileobj(
-            file.file,
-            S3_BUCKET,
-            file.filename,
-            ExtraArgs={"ContentType": file.content_type},
-        )
-        logging.info(f"File uploaded to S3 bucket: {S3_BUCKET}, Filename: {file.filename}")
-        textract_response = textract_client.start_document_text_detection(
-            DocumentLocation={
-                'S3Object': {
-                    'Bucket': S3_BUCKET,
-                    'Name': file.filename
-                }
-            }
-        )
-        job_id = textract_response['JobId']
-        logging.info(f"Started Textract job for text detection. Job ID: {job_id}")
-        status = None
-        while status != 'SUCCEEDED':
-            response = textract_client.get_document_text_detection(JobId=job_id)
-            status = response['JobStatus']
-            logging.info(f"Textract job status: {status}")
-            time.sleep(5)
-        extracted_text = ''
-        total_confidence = 0
-        confidence_count = 0
-        for result_page in response['Blocks']:
-            if result_page['BlockType'] == 'LINE':
-                extracted_text += result_page['Text'] + '\n'
-                total_confidence += result_page['Confidence']
-                confidence_count += 1
-        average_confidence = total_confidence / confidence_count if confidence_count > 0 else 0
-        logging.info(f"Text extracted successfully with average confidence: {average_confidence}")
-        return {
-            "message": "File uploaded and text extracted successfully",
-            "extracted_text": extracted_text,
-            "average_confidence": average_confidence
-        }
-    except NoCredentialsError:
-        logging.error("AWS credentials not found")
-        raise HTTPException(status_code=401, detail="AWS credentials not found")
-    except Exception as e:
-        logging.error(f"Error during file upload or text extraction: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to upload file or extract text: {str(e)}")
+# Function to truncate long text fields
+def truncate_field(field, max_length=100):
+    if isinstance(field, str) and len(field) > max_length:
+        return field[:max_length] + '...'  # Truncate and add ellipsis
+    return field
 
-@app.post("/upload-form")
-async def upload_form(file: UploadFile = File(...)):
-    try:
-        logging.info(f"File received for form extraction: {file.filename}, Content type: {file.content_type}")
-        s3_client.upload_fileobj(
-            file.file,
-            S3_BUCKET,
-            file.filename,
-            ExtraArgs={"ContentType": file.content_type},
-        )
-        logging.info(f"File uploaded to S3 bucket: {S3_BUCKET}, Filename: {file.filename}")
-        textract_response = textract_client.start_document_analysis(
-            DocumentLocation={
-                'S3Object': {
-                    'Bucket': S3_BUCKET,
-                    'Name': file.filename
-                }
-            },
-            FeatureTypes=["FORMS"]
-        )
-        job_id = textract_response['JobId']
-        logging.info(f"Started Textract job for form extraction. Job ID: {job_id}")
-        status = None
-        while status != 'SUCCEEDED':
-            response = textract_client.get_document_analysis(JobId=job_id)
-            status = response['JobStatus']
-            logging.info(f"Textract job status: {status}")
-            time.sleep(5)
-        extracted_key_values = {}
-        for block in response['Blocks']:
-            if block['BlockType'] == 'KEY_VALUE_SET' and 'KEY' in block.get('EntityTypes', []):
-                key_text = ''
-                for relationship in block.get('Relationships', []):
-                    if relationship['Type'] == 'CHILD':
-                        for child_id in relationship['Ids']:
-                            child_block = next((b for b in response['Blocks'] if b['Id'] == child_id), None)
-                            if child_block and 'Text' in child_block:
-                                key_text += child_block['Text']
-                value_text = ''
-                value_block = next((b for b in response['Blocks'] if b['Id'] in block.get('Relationships', [])[0].get('Ids', [])), None)
-                if value_block:
-                    for relationship in value_block.get('Relationships', []):
-                        if relationship['Type'] == 'CHILD':
-                            for child_id in relationship['Ids']:
-                                child_block = next((b for b in response['Blocks'] if b['Id'] == child_id), None)
-                                if child_block and 'Text' in child_block:
-                                    value_text += child_block['Text']
-                if key_text and value_text:
-                    extracted_key_values[key_text] = value_text
-        logging.info(f"Form extracted successfully with key-value pairs: {extracted_key_values}")
-        return {
-            "message": "File uploaded and form data extracted successfully",
-            "form_data": extracted_key_values
-        }
-    except NoCredentialsError:
-        logging.error("AWS credentials not found")
-        raise HTTPException(status_code=401, detail="AWS credentials not found")
-    except Exception as e:
-        logging.error(f"Error during file upload or form extraction: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to upload file or extract form data: {str(e)}")
+# Function to create a CSV from query data with truncated long fields
+def create_csv(data, headers, csv_filename="query_result.csv"):
+    with open(csv_filename, mode='w', newline='') as file:
+        writer = csv.writer(file)
+        
+        # Writing headers
+        writer.writerow(headers)
+        
+        # Writing data rows, truncating long fields
+        for row in data:
+            truncated_row = [truncate_field(field) for field in row]
+            writer.writerow(truncated_row)
+    
+    return csv_filename
 
-@app.post("/extract-info")
-async def extract_info(file: UploadFile = File(...)):
-    try:
-        logging.info(f"File received for AI-based processing: {file.filename}, Content type: {file.content_type}")
-        s3_client.upload_fileobj(
-            file.file, 
-            S3_BUCKET,  
-            file.filename,  
-            ExtraArgs={"ContentType": file.content_type},
-        )
-        logging.info(f"File uploaded to S3 bucket: {S3_BUCKET}, Filename: {file.filename}")
-        textract_response = textract_client.start_document_text_detection(
-            DocumentLocation={
-                'S3Object': {
-                    'Bucket': S3_BUCKET,
-                    'Name': file.filename
-                }
-            }
-        )
-        job_id = textract_response['JobId']
-        logging.info(f"Started Textract job for text detection. Job ID: {job_id}")
-        status = None
-        while status != 'SUCCEEDED':
-            response = textract_client.get_document_text_detection(JobId=job_id)
-            status = response['JobStatus']
-            logging.info(f"Textract job status: {status}")
-            time.sleep(5)
-        extracted_text = ''
-        for result_page in response['Blocks']:
-            if result_page['BlockType'] == 'LINE':
-                extracted_text += result_page['Text'] + '\n'
-        logging.info("Text extracted, sending to OpenAI for summarization and analysis.")
-        prompt = f"Summarize the following text and identify any medicines mentioned:\n\n{extracted_text}"
-        openai_response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt}
-            ],
-            max_tokens=300
-        )
-        summary_and_medicines = openai_response['choices'][0]['message']['content'].strip()
-        logging.info("OpenAI processing completed.")
-        return {
-            "message": "File processed and analyzed successfully",
-            "summary_and_medicines": summary_and_medicines
-        }
-    except NoCredentialsError:
-        logging.error("AWS credentials not found")
-        raise HTTPException(status_code=401, detail="AWS credentials not found")
-    except Exception as e:
-        logging.error(f"Error during file processing or analysis: {str(e)}")
-        raise HTTPException(status_code=500, detail=f"Failed to process or analyze file: {str(e)}")
+# Mapping for queries for each table
+TABLE_QUERIES = {
+    'diagnostic_report': "SELECT * FROM diagnostic_report WHERE branch_id = '{branch_id}'",
+    'diagnostic_report_detail': """
+        SELECT drd.*, dr.branch_id FROM diagnostic_report_detail drd 
+        JOIN diagnostic_report dr ON drd.diagnostic_report_id = dr.id 
+        WHERE dr.branch_id = '{branch_id}'
+    """,
+    'diagnostic_report_diagnostic_report_detail': """
+        SELECT drdrd.*, dr.branch_id 
+        FROM diagnostic_report_diagnostic_report_detail drdrd 
+        JOIN diagnostic_report dr ON drdrd.diagnostic_report_entity_id = dr.id 
+        WHERE dr.branch_id = '{branch_id}'
+    """,
+    'immunization_completion': """
+        SELECT ic.*, ir.branch_id 
+        FROM immunization_completion ic 
+        JOIN immunization_report ir ON ic.immunization_report_id = ir.id 
+        WHERE ir.branch_id = '{branch_id}'
+    """,
+    'immunization_recommendation': """
+        SELECT ir2.*, ir.branch_id 
+        FROM immunization_recommendation ir2 
+        JOIN immunization_report ir ON ir2.immunization_report_id = ir.id 
+        WHERE ir.branch_id = '{branch_id}'
+    """,
+    'immunization_report': "SELECT * FROM immunization_report WHERE branch_id = '{branch_id}'",
+    'immunization_report_immunization_completion': """
+        SELECT iric.*, ir.branch_id 
+        FROM immunization_report_immunization_completion iric 
+        JOIN immunization_report ir ON iric.immunization_report_entity_id = ir.id 
+        WHERE ir.branch_id = '{branch_id}'
+    """,
+    'immunization_report_immunization_recommendation': """
+        SELECT irir.*, ir.branch_id 
+        FROM immunization_report_immunization_recommendation irir 
+        JOIN immunization_report ir ON irir.immunization_report_entity_id = ir.id 
+        WHERE ir.branch_id = '{branch_id}'
+    """,
+    'combined_immunization': """
+        SELECT  ic.*, ir2.*, iric.*, irir.*
+        FROM immunization_report ir
+        LEFT JOIN immunization_completion ic ON ic.immunization_report_id = ir.id
+        LEFT JOIN immunization_recommendation ir2 ON ir2.immunization_report_id = ir.id
+        LEFT JOIN immunization_report_immunization_completion iric ON iric.immunization_report_entity_id = ir.id
+        LEFT JOIN immunization_report_immunization_recommendation irir ON irir.immunization_report_entity_id = ir.id
+        WHERE ir.branch_id = '{branch_id}'
+    """,
+    'patient_care': """
+        SELECT pc.*, mh.*
+        FROM patient_care pc
+        JOIN medical_history mh ON pc.medical_history_id = mh.id
+        WHERE mh.branch_id = '{branch_id}'
+    """,
+    'patient_care_consultations': """
+        SELECT pcc.*, pc.branch_id 
+        FROM patient_care_consultations pcc 
+        JOIN patient_care pc ON pcc.patient_care_entity_id = pc.id 
+        WHERE pc.branch_id = '{branch_id}'
+    """,
+    'patient_care_consumables': """
+        SELECT pcc.*, pc.branch_id 
+        FROM patient_care_consumables pcc 
+        JOIN patient_care pc ON pcc.patient_care_entity_id = pc.id 
+        WHERE pc.branch_id = '{branch_id}'
+    """,
+    'patient_care_lab_tests': """
+        SELECT pclt.*, pc.branch_id 
+        FROM patient_care_lab_tests pclt 
+        JOIN patient_care pc ON pclt.patient_care_entity_id = pc.id 
+        WHERE pc.branch_id = '{branch_id}'
+    """,
+    'patient_care_vaccinations': """
+        SELECT pcv.*, pc.branch_id 
+        FROM patient_care_vaccinations pcv 
+        JOIN patient_care pc ON pcv.patient_care_entity_id = pc.id 
+        WHERE pc.branch_id = '{branch_id}'
+    """,
+    'patient_care_vitals': """
+        SELECT pcv.*, pc.branch_id 
+        FROM patient_care_vitals pcv 
+        JOIN patient_care pc ON pcv.patient_care_entity_id = pc.id 
+        WHERE pc.branch_id = '{branch_id}'
+    """,
+    'medical_history': "SELECT * FROM medical_history WHERE branch_id = '{branch_id}'",
+    'combined_patient_care': """
+        SELECT pc.*, mh.*, pcc.*, pccu.*, pclt.*, pcv.*
+        FROM patient_care pc
+        JOIN medical_history mh ON pc.medical_history_id = mh.id
+        LEFT JOIN patient_care_consultations pcc ON pcc.patient_care_entity_id = pc.id
+        LEFT JOIN patient_care_consumables pccu ON pccu.patient_care_entity_id = pc.id
+        LEFT JOIN patient_care_lab_tests pclt ON pclt.patient_care_entity_id = pc.id
+        LEFT JOIN patient_care_vaccinations pcv ON pcv.patient_care_entity_id = pc.id
+        WHERE mh.branch_id = '{branch_id}'
+    """,
+    'combined_diagnostic_report': """
+        SELECT dr.*, drd.*, drdrd.*
+        FROM diagnostic_report dr
+        LEFT JOIN diagnostic_report_detail drd ON dr.id = drd.diagnostic_report_id
+        LEFT JOIN diagnostic_report_diagnostic_report_detail drdrd ON dr.id = drdrd.diagnostic_report_entity_id
+        WHERE dr.branch_id = '{branch_id}'
+    """
+}
+
+@app.get("/download-csv")
+async def download_csv(table_name: str, branch_id: str):
+    if table_name not in TABLE_QUERIES:
+        return Response(content=f"Table '{table_name}' not found", status_code=404)
+
+    query = TABLE_QUERIES[table_name].format(branch_id=branch_id)
+    data, headers = fetch_query_data(query)
+
+    if not data:
+        return Response(content="No data available for the provided branch_id", status_code=404)
+
+    csv_path = create_csv(data, headers, f"{table_name}_report.csv")
+    return FileResponse(path=csv_path, filename=f"{table_name}_report.csv", media_type="text/csv")
+
+# Close the connection when done
+@app.on_event("shutdown")
+def shutdown_event():
+    cur.close()
+    conn.close()
