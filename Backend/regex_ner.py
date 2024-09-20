@@ -4,24 +4,22 @@ import boto3
 from botocore.exceptions import NoCredentialsError
 from fastapi.middleware.cors import CORSMiddleware
 import time
+import spacy
+import re
 
-# Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-
 logger = logging.getLogger(__name__)
 
-# Initialize the FastAPI app
 app = FastAPI()
 
-# Set up AWS constants
 S3_BUCKET = "ocr-swingbell"
 S3_REGION = "ap-southeast-2"
 
-# Set up AWS clients
 s3_client = boto3.client("s3", region_name=S3_REGION)
 textract_client = boto3.client('textract', region_name=S3_REGION)
 
-# Set up CORS
+nlp = spacy.load('en_core_web_sm')
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -32,12 +30,11 @@ app.add_middleware(
 
 # Set up logging
 logging.basicConfig(
-    filename="app.log",  # Log file location
-    format="%(asctime)s - %(levelname)s - %(message)s",  # Log format
-    level=logging.INFO  # Set log level
+    filename="app.log",  
+    format="%(asctime)s - %(levelname)s - %(message)s", 
+    level=logging.INFO 
 )
 
-# Log startup
 logging.info("Application startup")
 
 @app.get("/")
@@ -46,13 +43,11 @@ async def read_root():
     return {"message": "Welcome to the file upload API"}
 
 
-# Endpoint for text extraction
 @app.post("/upload-text")
 async def upload_text(file: UploadFile = File(...)):
     try:
         logging.info(f"File received for text extraction: {file.filename}, Content type: {file.content_type}")
 
-        # Upload the file to S3
         s3_client.upload_fileobj(
             file.file, 
             S3_BUCKET,  
@@ -61,7 +56,6 @@ async def upload_text(file: UploadFile = File(...)):
         )
         logging.info(f"File uploaded to S3 bucket: {S3_BUCKET}, Filename: {file.filename}")
 
-        # Start Textract text detection
         textract_response = textract_client.start_document_text_detection(
             DocumentLocation={
                 'S3Object': {
@@ -74,7 +68,6 @@ async def upload_text(file: UploadFile = File(...)):
         job_id = textract_response['JobId']
         logging.info(f"Started Textract job for text detection. Job ID: {job_id}")
 
-        # Polling for job completion
         status = None
         while status != 'SUCCEEDED':
             response = textract_client.get_document_text_detection(JobId=job_id)
@@ -86,14 +79,12 @@ async def upload_text(file: UploadFile = File(...)):
         total_confidence = 0
         confidence_count = 0
 
-        # Extract text and confidence score
         for result_page in response['Blocks']:
             if result_page['BlockType'] == 'LINE':
                 extracted_text += result_page['Text'] + '\n'
                 total_confidence += result_page['Confidence']
                 confidence_count += 1
 
-        # Calculate average confidence score
         average_confidence = total_confidence / confidence_count if confidence_count > 0 else 0
 
         logging.info(f"Text extracted successfully with average confidence: {average_confidence}")
@@ -113,7 +104,6 @@ async def upload_text(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=f"Failed to upload file or extract text: {str(e)}")
 
 
-# Endpoint for form extraction (key-value pairs)
 @app.post("/upload-form")
 async def upload_form(file: UploadFile = File(...)):
     try:
@@ -128,7 +118,6 @@ async def upload_form(file: UploadFile = File(...)):
         )
         logging.info(f"File uploaded to S3 bucket: {S3_BUCKET}, Filename: {file.filename}")
 
-        # Start Textract document analysis for FORMS
         textract_response = textract_client.start_document_analysis(
             DocumentLocation={
                 'S3Object': {
@@ -136,13 +125,12 @@ async def upload_form(file: UploadFile = File(...)):
                     'Name': file.filename
                 }
             },
-            FeatureTypes=["FORMS"]  # Extract key-value pairs from forms
+            FeatureTypes=["FORMS"]  
         )
 
         job_id = textract_response['JobId']
         logging.info(f"Started Textract job for form extraction. Job ID: {job_id}")
 
-        # Polling for job completion
         status = None
         while status != 'SUCCEEDED':
             response = textract_client.get_document_analysis(JobId=job_id)
@@ -150,12 +138,10 @@ async def upload_form(file: UploadFile = File(...)):
             logging.info(f"Textract job status: {status}")
             time.sleep(5)
 
-        # Parsing key-value pairs (form fields)
         extracted_key_values = {}
         for block in response['Blocks']:
             if block['BlockType'] == 'KEY_VALUE_SET' and 'KEY' in block.get('EntityTypes', []):
                 key_text = ''
-                # Extract the key
                 for relationship in block.get('Relationships', []):
                     if relationship['Type'] == 'CHILD':
                         for child_id in relationship['Ids']:
@@ -163,7 +149,6 @@ async def upload_form(file: UploadFile = File(...)):
                             if child_block and 'Text' in child_block:
                                 key_text += child_block['Text']
 
-                # Extract the value associated with the key
                 value_text = ''
                 value_block = next((b for b in response['Blocks'] if b['Id'] in block.get('Relationships', [])[0].get('Ids', [])), None)
                 if value_block:
@@ -179,9 +164,11 @@ async def upload_form(file: UploadFile = File(...)):
 
         logging.info(f"Form extracted successfully with key-value pairs: {extracted_key_values}")
 
+        ner_results = process_with_ner(extracted_key_values)
+
         return {
             "message": "File uploaded and form data extracted successfully", 
-            "form_data": extracted_key_values
+            "form_data": ner_results
         }
     
     except NoCredentialsError:
@@ -191,3 +178,34 @@ async def upload_form(file: UploadFile = File(...)):
     except Exception as e:
         logging.error(f"Error during file upload or form extraction: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Failed to upload file or extract form data: {str(e)}")
+
+def process_with_ner(data):
+   
+    combined_text = ' '.join(data.values())
+   
+    doc = nlp(combined_text)
+ 
+    ner_results = {
+        "names": [],
+        "addresses": [],
+        "phone_numbers": [],
+        "emails": []
+    }
+
+    for ent in doc.ents:
+        if ent.label_ == "PERSON":
+            ner_results["names"].append(ent.text)
+        elif ent.label_ == "GPE": 
+            ner_results["addresses"].append(ent.text)
+
+    phone_regex = re.compile(r'\+?\d[\d -]{8,}\d')
+    email_regex = re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b')
+
+    combined_text = combined_text.lower()
+    phone_numbers = phone_regex.findall(combined_text)
+    emails = email_regex.findall(combined_text)
+
+    ner_results["phone_numbers"].extend(phone_numbers)
+    ner_results["emails"].extend(emails)
+
+    return ner_results
