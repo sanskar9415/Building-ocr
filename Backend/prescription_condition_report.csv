@@ -1,0 +1,87 @@
+id,condition,condition_sct_id,duration,duration_unit,prescription_id,notes,severity,branch_id
+6,,0,0,Day/s,2038,,,6
+7,,0,0,Day/s,2050,,,6
+8,Does throw,282667008,2,Day/s,2059,,,6
+9,Cough,49727002,1,Day/s,2063,,,6
+10,Fever,386661006,1,Day/s,2071,,,6
+11,Drug fever,95908009,1,Day/s,2081,,,6
+12,O/E - fever,271897009,2,Day/s,2082,,,6
+13,Viral fever,10151000132103,1,Day/s,2086,,,6
+14,No cough,139177007,1,Day/s,2091,,,6
+15,Drug fever,95908009,1,Day/s,2095,,,6
+16,Fever,386661006,1,Day/s,2102,,,6
+5,Dry cough,11833005,20,Day/s,2036,,,6
+17,Unconscious,271784000,0,Week/s,2108,,,6
+18,Cough,49727002,1,Day/s,2113,,,6
+19,Finding related to ability to unscrew a lid (finding),365170008,0,Week/s,2120,,,6
+20,Fever,386661006,1,Day/s,2125,,,6
+21,Fever,386661006,3,Day/s,2127,,,6
+22,Dirty home,224270005,3,Week/s,2131,,,6
+23,Viral fever,10151000132103,1,Day/s,2136,,,6
+25,Skin dirty,247424000,3,Day/s,2143,,,6
+26,Fever,386661006,1,Day/s,2148,,,6
+27,Cough,49727002,4,Day/s,2160,,,6
+29,Fever,386661006,4,Day/s,2162,,,6
+28,Cough,49727002,4,Day/s,2162,,,6
+30,Arterial carbon dioxide within reference range (finding),167029007,3,Day/s,2169,,,6
+31,Optic cup filled,247202002,9,Week/s,2185,,,6
+32,Cough,49727002,4,Day/s,2188,,,6
+33,Dry cough,11833005,1,Day/s,2192,,,6
+34,Feverish cold,366946004,1,Day/s,2199,,,6
+35,Fever,386661006,2,Day/s,2201,,,6
+36,Born in Ethiopia,161325000,2,Day/s,2205,,,6
+37,Trunk feels cold,248429007,1,Day/s,2214,,,6
+38,Patient suffering from mental illness under the MHA 1983,303001000,1,Month/s,2223,,,6
+39,Allergy to ertapenem,441725009,0,Week/s,2229,,,6
+40,Born in Ethiopia,138597003,1,Day/s,2239,,,6
+41,Allergy to itraconazole,294366006,3,Day/s,2247,,,6
+42,Fever,386661006,2,Day/s,2257,,,6
+43,Derealization,40806005,0,Day/s,2260,,,6
+44,Swelling,65124004,3,Week/s,2264,,,6
+46,Dry eye,139560003,12,Week/s,2278,,,6
+47,Dry eye,139560003,12,Day/s,2279,,,6
+48,Bloating,0,1,Day,2280,,,6
+49,Body Pain,0,1,Day,2281,,,6
+50,Dizziness,0,1,Day,2282,,,6
+51,Bloating,0,1,Day,2284,,,6
+52,Body Pain,0,1,Day,2286,Legs,Mild,6
+54,Pain in Eyes,0,2,Day/s,2288,,Mild,6
+53,Eye Redness,0,1,Day,2288,Right Eye,Mild,6
+55,Crime inj comp cert NOS,153075002,1,Week/s,2298,,,6
+56,Trembling,274896001,1,Day/s,2304,,,6
+57,Headache,139490008,2,Day/s,2314,,,6
+58,Confused,271592006,2,Day/s,2318,,,6
+59,Back pain,399079008,3,Day/s,2326,,,6
+63,Headache,25064002,3,Day/s,2349,,,6
+62,Back pain,419258005,1,Week/s,2337,,,6
+61,Feels cold,64713002,3,Day/s,2337,,,6
+60,Fever,386661006,3,Day/s,2337,,,6
+66,Backache,161891005,1,Week/s,2353,,,6
+65,Cold feet,271585001,3,Day/s,2353,,,6
+64,Fever,386661006,5,Day/s,2353,,,6
+67,Macrobiotic diet,102268008,1,Week/s,2362,,,6
+68,Flat optic disc,830294002,2,Week/s,2367,,,6
+69,Fever,386661006,2,Day/s,2376,,,6
+70,Head lag,390099005,4,Month/s,2382,,,6
+71,Fever,386661006,2,Week/s,2384,,,6
+72,FEV normal,165042006,2,Day/s,2386,,,6
+74,Ear normal,300196000,8,Day/s,2391,,,6
+73,Feverish cold,367171008,5,Day/s,2389,,,6
+75,Drug fever,95908009,10,Day/s,2393,,,6
+76,Fever,386661006,1,Day/s,2395,,,6
+78,Feverish cold,367171008,3,Day/s,2404,,,6
+77,Fever,386661006,7,Day/s,2404,,,6
+79,Arthritis,372091005,1,Week/s,2418,,,6
+80,Smear inflamed - recall delete,153795002,7,Day/s,2421,,,6
+81,Headache,139490008,3,Day/s,2425,,,6
+82,Drug fever,95908009,2,Week/s,2429,,,6
+83,Hyperextension,89620005,1,Month/s,2431,,,6
+84,ECG normal,142014007,2,Week/s,2438,,,6
+85,Sinus rhythm,251150006,3,Day/s,2442,,,6
+86,Headache,139490008,3,Week/s,2454,,,6
+87,Fever,386661006,2,Day/s,2459,,,6
+88,Headache,25064002,3,Week/s,2463,,,6
+89,Increased thirst,249477003,30,Day/s,2469,,,6
+90,Headache,25064002,30,Day/s,2478,,,6
+91,Headache,139490008,3,Day/s,2486,,,6
+92,Headache,25064002,30,Day/s,2490,,,6
