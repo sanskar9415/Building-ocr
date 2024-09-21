@@ -85,3 +85,4 @@ id,condition,condition_sct_id,duration,duration_unit,prescription_id,notes,sever
 90,Headache,25064002,30,Day/s,2478,,,6
 91,Headache,139490008,3,Day/s,2486,,,6
 92,Headache,25064002,30,Day/s,2490,,,6
+93,Fever,386661006,1,Day/s,2495,,,6

@@ -70,6 +70,12 @@ TABLE_QUERIES = {
         JOIN diagnostic_report dr ON drd.diagnostic_report_id = dr.id 
         WHERE dr.branch_id = '{branch_id}'
     """,
+    'diagnostic_report_detail': """
+    SELECT drd.*, dr.branch_id
+    FROM diagnostic_report_detail drd
+    JOIN diagnostic_report dr ON drd.diagnostic_report_id = dr.id
+    WHERE dr.branch_id = '{branch_id}'
+""",
     'diagnostic_report_diagnostic_report_detail': """
         SELECT drdrd.*, dr.branch_id 
         FROM diagnostic_report_diagnostic_report_detail drdrd 
@@ -134,11 +140,11 @@ TABLE_QUERIES = {
         JOIN patient_care pc ON pclt.patient_care_entity_id = pc.id 
         WHERE pc.branch_id = '{branch_id}'
     """,
-    'patient_care_vaccinations': """
-        SELECT pcv.*, pc.branch_id 
-        FROM patient_care_vaccinations pcv 
-        JOIN patient_care pc ON pcv.patient_care_entity_id = pc.id 
-        WHERE pc.branch_id = '{branch_id}'
+   'patient_care_vaccinations': """
+        SELECT pcv.*, pc.branch_id
+        FROM patient_care_vaccinations pcv
+        JOIN patient_care pc ON pcv.patient_care_entity_id = pc.id
+        WHERE pc.branch_id = '{branch_id}';
     """,
     'patient_care_vitals': """
         SELECT pcv.*, pc.branch_id 
@@ -201,6 +207,69 @@ TABLE_QUERIES = {
         LEFT JOIN prescription_prescription_condition ppc ON p.id = ppc.prescription_entity_id
         WHERE p.branch_id = '{branch_id}'
     """,
+    'consultation': """
+    SELECT c.*, pc.branch_id
+    FROM consultation c
+    JOIN patient_care pc ON c.patient_care_id = pc.id
+    WHERE pc.branch_id = '{branch_id}'
+""",
+'consumables': """
+    SELECT c.*, pc.branch_id
+    FROM consumables c
+    JOIN patient_care pc ON c.patient_care_id = pc.id
+    WHERE pc.branch_id = '{branch_id}'
+""",
+'vital_info': """
+    SELECT vi.*, pc.branch_id
+    FROM vital_info vi
+    JOIN patient_care pc ON vi.patient_care_id = pc.id
+    WHERE pc.branch_id = '{branch_id}'
+""",
+'vaccination': """
+    SELECT v.*, pc.branch_id
+    FROM vaccination v
+    JOIN patient_care pc ON v.patient_care_id = pc.id
+    WHERE pc.branch_id = '{branch_id}'
+""",
+'vital_detail': """
+    SELECT * FROM vital_detail vd WHERE branch_id = '{branch_id}'
+""",
+'patient_profile': """
+    SELECT * FROM patient_profile pp WHERE branch_id = '{branch_id}'
+""",
+'patient_queue': """
+    SELECT * FROM patient_queue pq WHERE branch_id = '{branch_id}'
+""",
+'patient_visit': """
+    SELECT * FROM patient_visit pv WHERE branch_id = '{branch_id}'
+""",
+'op_consultation': """
+    SELECT * FROM op_consultation oc WHERE branch_id = '{branch_id}'
+""",
+'medical_history': """
+    SELECT * FROM medical_history mh WHERE branch_id = '{branch_id}'
+""",
+'consent_request': """
+    SELECT * FROM consent_request cr WHERE branch_id = '{branch_id}'
+""",
+'consolidated_report': """
+    SELECT * FROM consolidated_report cr WHERE branch_id = '{branch_id}'
+""",
+'discover_and_link': """
+    SELECT * FROM discover_and_link dal WHERE branch_id = '{branch_id}'
+""",
+'health_professional': """
+    SELECT * FROM health_professional hp WHERE branch_id = '{branch_id}'
+""",
+'hip_data_push_notification': """
+    SELECT * FROM hip_data_push_notification hdpn WHERE branch_id = '{branch_id}'
+""",
+'hip_data_push_request': """
+    SELECT * FROM hip_data_push_request hdpr WHERE branch_id = '{branch_id}'
+""",
+
+
+
     'combined_facility': """
         SELECT f.*, fb.*, fs2.*
         FROM facility f
@@ -226,11 +295,16 @@ async def download_csv(table_name: str, branch_id: str = None):
 
     data, headers = fetch_query_data(query)
 
+    # If no data is available, still generate a CSV with just headers
     if not data:
-        return Response(content="No data available for the provided parameters", status_code=404)
+        # Create an empty CSV with only the headers
+        csv_path = create_csv([], headers, f"{table_name}_report.csv")
+        return FileResponse(path=csv_path, filename=f"{table_name}_report.csv", media_type="text/csv")
 
+    # Create a CSV with the data
     csv_path = create_csv(data, headers, f"{table_name}_report.csv")
     return FileResponse(path=csv_path, filename=f"{table_name}_report.csv", media_type="text/csv")
+
 
 # Close the connection when done
 @app.on_event("shutdown")

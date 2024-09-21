@@ -1,6 +1,6 @@
 id,dosage_add_instruction,dosage_instruction,dosage_instruction_sct_id,dosage_method,dosage_method_sct_id,dosage_route,dosage_route_sct_id,drug_name,drug_name_sct_id,duration,duration_unit,duration_unit_sct_id,quantity,prescription_id,branch_id
 5,NA,With or after food,311504000,Swallow,421521009,Oral route,26643006,Sulindac 150mg tablet,375512001,1,Day/s,0,"[1, 1, 1]",2036,6
-6,,Every morning,307472001,Daily,69620002,Oral,260548002,Product containing precisely cannabidiol 100 milligram/1 milliliter conventional release oral solution (clinical drug),895674004,1,Day/s,0,"[1, 1, 1]",2038,6
+6,,Every morning,307472001,Daily,69620002,Oral,260548002,Product containing precisely cannabidiol 100 milligram/1 milliliter conventional release oral soluti...,895674004,1,Day/s,0,"[1, 1, 1]",2038,6
 7,,Every three days,396128003,Three times daily,229798009,Thracia,262204004,Pergolide 1mg tablet (product),323165002,3,Week/s,0,"[1, 0, 1]",2059,6
 8,NA,After food,225758001,Swallow clinic,310133000,Oral route,26643006,Paracetamol 500mg tablet,322236009,2,Day/s,0,"[1, 1, 1]",2063,6
 9,NA,Oral liquid,385022006,"Swallowed whole, not chewed",418693002,Oral surgery,393349002,Paracetamol 325mg tablet,370150001,2,Day/s,0,"[1, 1, 1]",2071,6
@@ -10,7 +10,7 @@ id,dosage_add_instruction,dosage_instruction,dosage_instruction_sct_id,dosage_me
 13,NA,Biosafety level 3,409604003,"Swallowed whole, not chewed",418693002,Oral surgery,394299009,Paracetamol 160mg tablet,370149001,3,Day/s,0,"[1, 0, 0]",2091,6
 14,NA,After lunch,1541000175107,Swallowed whole,420004004,Oral surgery,393349002,Paracetamol 650mg tablet,370151002,2,Day/s,0,"[1, 1, 1]",2095,6
 15,NA,After lunch,1541000175107,Swallow,421521009,Oral route,26643006,Paracetamol 500mg tablet,322236009,2,Day/s,0,"[1, 1, 1]",2102,6
-16,fhgutti,Once daily,229797004,Widowed mother's allowance,161000000,Oral,260548002,Product containing precisely cannabidiol 100 milligram/1 milliliter conventional release oral solution (clinical drug),895674004,123,Day/s,0,"[1, 1, 1]",2108,6
+16,fhgutti,Once daily,229797004,Widowed mother's allowance,161000000,Oral,260548002,Product containing precisely cannabidiol 100 milligram/1 milliliter conventional release oral soluti...,895674004,123,Day/s,0,"[1, 1, 1]",2108,6
 17,NA,With or after food,311504000,Swallow,421521009,Oral route,26643006,Paracetamol 500mg tablet,322236009,2,Day/s,0,"[1, 1, 1]",2113,6
 18,,Every morning,307472001,>2 fingers,260314002,Oral liquid,385022006,Cannabidiol 100 mg/mL oral solution,895674004,3,Week/s,0,"[1, 1, 1]",2120,6
 19,,With meals,769557005,Oral,260548002,Oral surgery,393349002,Paracetamol 160mg tablet,370149001,3,Day/s,0,"[1, 1, 1]",2125,6
@@ -22,19 +22,19 @@ id,dosage_add_instruction,dosage_instruction,dosage_instruction_sct_id,dosage_me
 25,NA,With lunch,769560003,Swallow,421521009,Oral route,26643006,Paracetamol 325mg tablet,370150001,5,Day/s,0,"[1, 1, 1]",2160,6
 26,NA,With lunch,769560003,Swallow,421521009,Oral,260548002,Paracetamol 500mg tablet,322236009,5,Day/s,0,"[1, 1, 1]",2162,6
 27,NA,With lunch,769560003,Swallow,421521009,Oral route,26643006,Ibuprofen 400mg tablet,329653008,5,Day/s,0,"[1, 1, 1]",2162,6
-28,,Duration of individual treatment,226028008,Mixed venous and arterial (qualifier value),263814009,Oral liquid,385022006,Product containing precisely cannabidiol 100 milligram/1 milliliter conventional release oral solution (clinical drug),895674004,2,Day/s,0,"[1, 1, 1]",2169,6
+28,,Duration of individual treatment,226028008,Mixed venous and arterial (qualifier value),263814009,Oral liquid,385022006,Product containing precisely cannabidiol 100 milligram/1 milliliter conventional release oral soluti...,895674004,2,Day/s,0,"[1, 1, 1]",2169,6
 29,,Mixed,26242008,Mixtec language,297791004,Oral liquid,385022006,Cannabidiol 100 mg/mL oral solution,895674004,7,Month/s,0,"[1, 1, 1]",2185,6
 30,NA,With lunch,769560003,Swallow,421521009,Oral route,26643006,Paracetamol 650mg tablet,370151002,1,Day/s,0,"[1, 1, 1]",2188,6
 31,NA,With lunch,769560003,Swallow,421521009,Oral route,26643006,Paracetamol 160mg tablet,370149001,1,Day/s,0,"[1, 1, 1]",2192,6
 32,NA,After food,225758001,Swallow,421521009,Oral,260548002,Paracetamol 325mg tablet,370150001,2,Day/s,0,"[1, 1, 1]",2199,6
 33,"High Fever, bed Rest",After food,225758001,Swallow,421521009,Oral,260548002,Paracetamol 650mg tablet,370151002,2,Day/s,0,"[1, 0, 1]",2201,6
-34,,Night and morning,309614008,Mixed venoarterial and venovenous (qualifier value),261945002,Oral surgery,394605001,Product containing precisely cannabidiol 100 milligram/1 milliliter conventional release oral solution (clinical drug),895674004,6,Day/s,0,"[1, 1, 1]",2205,6
+34,,Night and morning,309614008,Mixed venoarterial and venovenous (qualifier value),261945002,Oral surgery,394605001,Product containing precisely cannabidiol 100 milligram/1 milliliter conventional release oral soluti...,895674004,6,Day/s,0,"[1, 1, 1]",2205,6
 69,,After food,225758001,Swallow,421521009,Oral route,26643006,Paracetamol 500mg capsule,322280009,10,Day/s,0,"[1, 0, 1]",2404,6
 35,,Every morning,307472001,Salinem (qualifier value),262125008,Oral liquid,385022006,Sodium iopodate 500 mg/1 each oral capsule,337375002,21,Day/s,0,"[1, 1, 1]",2214,6
 36,,Every lunchtime,444752003,Dissolve or mix with water before taking (qualifier value),417995008,Oral,260548002,Cannabidiol 100 mg/mL oral solution,895674004,1,Week/s,0,"[1, 1, 1]",2223,6
-37,u,Try-in of device - action,360154009,Waterskiing,34310006,Oral,260548002,Ertugliflozin (as ertugliflozin pidolate) 5 mg and sitagliptin (as sitagliptin phosphate) 100 mg oral tablet,1303104004,u,Day/s,0,"[1, 1, 1]",2229,6
+37,u,Try-in of device - action,360154009,Waterskiing,34310006,Oral,260548002,Ertugliflozin (as ertugliflozin pidolate) 5 mg and sitagliptin (as sitagliptin phosphate) 100 mg ora...,1303104004,u,Day/s,0,"[1, 1, 1]",2229,6
 38,N-ok,Free dental treatment,161025009,1.876 (qualifier value),732437001,Oral surgery,394605001,Vidarabine 3% opthalmic ointment (product),392553005,1,Week/s,0,"[1, 1, 1]",2239,6
-39,,Free dental treatment,161025009,Waters - 35 degree tilt to radiographic baseline,260473000,Oral route,26643006,Product containing precisely iodine (as iotroxate meglumine) 50 milligram/1 milliliter conventional release solution for injection (clinical drug),1208343006,1,Week/s,0,"[1, 1, 1]",2247,6
+39,,Free dental treatment,161025009,Waters - 35 degree tilt to radiographic baseline,260473000,Oral route,26643006,Product containing precisely iodine (as iotroxate meglumine) 50 milligram/1 milliliter conventional ...,1208343006,1,Week/s,0,"[1, 1, 1]",2247,6
 40,NA,With lunch,769560003,Swallow,421521009,Oral route,26643006,Paracetamol 325mg tablet,370150001,5,Day/s,0,"[1, 1, 1]",2257,6
 41,,Assertion,397747003,Water-borne transmission,418117003,Orange color,371242008,Iron (as ferric derisomaltose) 50 mg/mL solution for injection,1172495002,1,Day/s,0,"[1, 1, 1]",2260,6
 42,,IU/0.1mL (qualifier value),282410006,Injection - action,129326001,Body cavity scope approach,304127005,Ketamine (as ketamine hydrochloride) 1 g/10 mL solution for injection vial,769852008,2,Week/s,0,"[1, 1, 1]",2264,6
@@ -43,7 +43,7 @@ id,dosage_add_instruction,dosage_instruction,dosage_instruction_sct_id,dosage_me
 46,Checking notes,,0,,0,,0,Amoxicillin,0,1,Day,0,[],2290,6
 47,Checking manual duration,,0,,0,,0,Atorvastatin,0,12,Day/s,0,[],2290,6
 48,,Mordvin language,297920003,Injection,385218009,Oral liquid,385022006,Cannabidiol 100 mg/mL oral solution,895674004,1,Day/s,0,"[1, 1, 1]",2298,6
-49,,Cyclotron,78898006,Engaged in waterskiing (qualifier value),34310006,"This level includes drinks that flow off a spoon and are sippable, pour quickly from a spoon, but slower than thin drinks. Mild effort is required to drink this thickness through standard bore straw (standard bore straw = 0.209 inch or 5.3 mm diameter).",1237442003,Cannabidiol 100 mg/mL oral solution,895674004,1,Day/s,0,"[1, 1, 1]",2304,6
+49,,Cyclotron,78898006,Engaged in waterskiing (qualifier value),34310006,"This level includes drinks that flow off a spoon and are sippable, pour quickly from a spoon, but sl...",1237442003,Cannabidiol 100 mg/mL oral solution,895674004,1,Day/s,0,"[1, 1, 1]",2304,6
 50,,Before food,311500009,Oral,260548002,Oral,260548002,Lisinopril 10mg tablet,318859000,7,Day/s,0,"[1, 0]",2314,6
 51,,Klamath language,297795008,Method values,277262009,Manhao 2,262434007,Paracetamol 325mg tablet,370150001,2,Day/s,0,"[1, 0, 1]",2318,6
 52,,Before food,311500009,Oral,260548002,Oral route,26643006,Lisinopril 10mg tablet,318859000,7,Day/s,0,"[1, 0]",2326,6
@@ -60,7 +60,7 @@ id,dosage_add_instruction,dosage_instruction,dosage_instruction_sct_id,dosage_me
 63,NA,After food,225758001,Swallow,421521009,Oral route,26643006,Paracetamol 160mg tablet,370149001,2,Day/s,0,"[1, 0, 0]",2384,6
 64,,After food,225758001,Swallow clinic,310133000,Oral,260548002,Paracetamol 160mg tablet,370149001,2,Day/s,0,"[1, 1, 1]",2386,6
 65,,After food,225758001,Swallow,421521009,Oral route,26643006,Paracetamol 500mg tablet,322236009,5,Day/s,0,"[1, 0, 1]",2389,6
-66,,morgan,304616007,White water rafting,102401001,Oral route,26643006,Product containing precisely cannabinol 25 milligram/1 milliliter and tetrahydrocannabinol 27 milligram/1 milliliter conventional release oral spray (clinical drug),785992006,1,Week/s,0,"[1, 1, 1]",2391,6
+66,,morgan,304616007,White water rafting,102401001,Oral route,26643006,Product containing precisely cannabinol 25 milligram/1 milliliter and tetrahydrocannabinol 27 millig...,785992006,1,Week/s,0,"[1, 1, 1]",2391,6
 67,NA,With lunch,769560003,Swallow,421521009,Oral,260548002,Paracetamol 500mg tablet,322236009,10,Day/s,0,"[1, 1, 1]",2393,6
 68,NA,With lunch,769560003,Swallow,421521009,Oral route,26643006,Paracetamol 500mg tablet,322236009,10,Day/s,0,"[1, 1, 1]",2395,6
 70,,After food,225758001,Swallow,421521009,Oral route,26643006,Citalopram 20mg tablet,321987003,5,Day/s,0,"[1, 0, 1]",2404,6
