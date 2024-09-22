@@ -1,0 +1,5 @@
+id,branch_id,created_at,facility_id,patient_id,updated_at,medical_history_id,id,allergy,branch_id,created_at,facility_id,illness,medicines,patient_id,surgery,updated_at,visit_id
+2068,6,2024-08-21 08:36:46.450000,1,10390,2024-08-22 11:11:54.862000,2237,2237,"['Allergy to dust', 'Egg allergy']",6,2024-08-21 08:37:21.078000,1,"['Diabetes', 'Heart Disease']",['Paracetamol 160mg tablet'],10390,None,,2068
+2079,6,2024-08-22 10:28:56.516000,1,10396,2024-08-22 10:29:33.217000,2251,2251,[],6,2024-08-22 10:29:33.166000,1,[],[],10396,Cathartic,,2079
+2080,6,2024-08-22 11:09:45.182000,1,10397,2024-08-23 19:24:57.031000,2252,2252,['Allergy to dust'],6,2024-08-22 11:10:08.824000,1,"['Diabetes', 'Heart Disease']",['Paracetamol 160mg tablet'],10397,None,,2080
+2083,6,2024-08-23 20:06:28.865000,1,10397,2024-08-23 20:07:02.181000,2254,2254,[],6,2024-08-23 20:07:02.125000,1,"['Diabetes', 'Heart Disease']",[],10397,,,2083

@@ -1,0 +1,4 @@
+facility_id,address,complete_name,created_at,hip_id,hiu_id,reg_number,short_name,updated_at,branch_id,address,complete_name,created_at,hip_id,hiu_id,reg_number,short_name,updated_at,facility_id,facility_facility_id,staff_id,created_at,facility_branch_id,facility_id,login_id,name,password,role,updated_at
+1,,Apollo,2024-06-25 17:19:23.549000,apollo,apollo,100,Apollo,,5,"Hsr Layout, Bangalore",Apollo Bangalore,2024-06-25 17:51:51.959000,swingbell_test,swingbell_test,101,Apollo Bangalore,,1,,,,,,,,,,
+1,,Apollo,2024-06-25 17:19:23.549000,apollo,apollo,100,Apollo,,6,"Rajeev Market, Indore",Apollo Indore,2024-06-25 19:26:04.034000,swingbell_test,swingbell_test,102,Apollo Indore,,1,,,,,,,,,,
+1,,Apollo,2024-06-25 17:19:23.549000,apollo,apollo,100,Apollo,,7,"Chess Garden, Gurgaon",Apollo Gurgaon,2024-06-25 19:30:06.090000,swingbell_test,swingbell_test,103,Apollo Gurgaon,,1,,,,,,,,,,

@@ -1,16 +1,22 @@
+import logging
 from fastapi import FastAPI, Response
-from fastapi.responses import FileResponse
 import psycopg2
 import csv
 import os
 from fastapi.middleware.cors import CORSMiddleware
+from botocore.exceptions import NoCredentialsError
+import boto3
 
+# Initialize FastAPI app
 app = FastAPI()
 
-origins = [
-    "http://localhost:5173",  # Your frontend's URL
-]
+# S3 configuration
+S3_BUCKET = "ocr-swingbell"
+S3_REGION = "ap-southeast-2"
+s3_client = boto3.client("s3", region_name=S3_REGION)
 
+# Enable CORS for frontend URL
+origins = ["http://localhost:5173"]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
@@ -28,6 +34,10 @@ conn = psycopg2.connect(
     port="5432"
 )
 cur = conn.cursor()
+
+# Logging configuration
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
+
 
 # Function to execute a query and return data
 def fetch_query_data(query):
@@ -51,16 +61,43 @@ def truncate_field(field, max_length=100):
 def create_csv(data, headers, csv_filename="query_result.csv"):
     with open(csv_filename, mode='w', newline='') as file:
         writer = csv.writer(file)
-        
-        # Writing headers
-        writer.writerow(headers)
-        
-        # Writing data rows, truncating long fields
-        for row in data:
+        writer.writerow(headers)  # Writing headers
+        for row in data:  # Writing data rows, truncating long fields
             truncated_row = [truncate_field(field) for field in row]
             writer.writerow(truncated_row)
-    
     return csv_filename
+
+# Function to upload CSV to S3
+def upload_to_s3(file_path, s3_folder):
+    try:
+        s3_key = f"{s3_folder}/{os.path.basename(file_path)}"
+        logging.info(f"Uploading {file_path} to S3 bucket {S3_BUCKET} at {s3_key}")
+        s3_client.upload_file(file_path, S3_BUCKET, s3_key)
+        s3_url = f"https://{S3_BUCKET}.s3.{S3_REGION}.amazonaws.com/{s3_key}"
+        logging.info(f"File successfully uploaded to {s3_url}")
+        return s3_url
+    except FileNotFoundError:
+        logging.error("The file was not found")
+        return "The file was not found"
+    except NoCredentialsError:
+        logging.error("Credentials not available")
+        return "Credentials not available"
+    except Exception as e:
+        logging.error(f"An error occurred: {str(e)}")
+        return f"An error occurred: {str(e)}"
+
+# Function to download CSV from S3
+def download_from_s3(s3_url, download_path):
+    try:
+        s3_key = s3_url.split(f"{S3_BUCKET}.s3.{S3_REGION}.amazonaws.com/")[1]
+        logging.info(f"Downloading from S3 {s3_url} to local path {download_path}")
+        s3_client.download_file(S3_BUCKET, s3_key, download_path)
+        logging.info(f"File successfully downloaded to {download_path}")
+        return download_path
+    except Exception as e:
+        logging.error(f"An error occurred during download: {str(e)}")
+        return f"An error occurred: {str(e)}"
+
 
 # Mapping for queries for each table
 TABLE_QUERIES = {
@@ -279,6 +316,9 @@ TABLE_QUERIES = {
     """
 }
 
+
+
+
 @app.get("/download-csv")
 async def download_csv(table_name: str, branch_id: str = None):
     if table_name not in TABLE_QUERIES:
@@ -293,20 +333,28 @@ async def download_csv(table_name: str, branch_id: str = None):
     else:
         query = TABLE_QUERIES[table_name].format(branch_id=branch_id)
 
+    # Fetch data and headers from the database
     data, headers = fetch_query_data(query)
 
-    # If no data is available, still generate a CSV with just headers
-    if not data:
-        # Create an empty CSV with only the headers
-        csv_path = create_csv([], headers, f"{table_name}_report.csv")
-        return FileResponse(path=csv_path, filename=f"{table_name}_report.csv", media_type="text/csv")
+    # Create a temporary CSV file
+    csv_filename = f"{table_name}_report.csv"
+    create_csv(data, headers, csv_filename)
 
-    # Create a CSV with the data
-    csv_path = create_csv(data, headers, f"{table_name}_report.csv")
-    return FileResponse(path=csv_path, filename=f"{table_name}_report.csv", media_type="text/csv")
+    # Create an S3 folder name based on branch_id
+    s3_folder = f"branch_id_{branch_id}"
+
+    # Upload the CSV to S3
+    s3_url = upload_to_s3(csv_filename, s3_folder)
+
+    if "http" not in s3_url:
+        return Response(content=s3_url, status_code=500)
+
+    download_path = f"downloads/{csv_filename}" 
+    download_from_s3(s3_url, download_path)
+
+    return {"message": "CSV uploaded and downloaded successfully", "url": s3_url, "local_file": download_path}
 
 
-# Close the connection when done
 @app.on_event("shutdown")
 def shutdown_event():
     cur.close()
